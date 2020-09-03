@@ -403,7 +403,34 @@ jobs:
     after_script:
       - echo "The following images have been built and pushed to dockerhub:"
       - docker images | grep keptn
-
+  - stage: Build Docker Images
+    arch: arm64
+    if: branch = master AND (type = cron or type = push)
+    os: linux
+    services:
+      - docker
+    script:
+    - export VERSION="master+${DATE}"
+    - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
+    - ./writeManifest.sh
+    - cat MANIFEST
+    - source ./travis-scripts/build_develop.sh "${API_IMAGE}" "${API_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${OS_ROUTE_SVC_IMAGE}" "${OS_ROUTE_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${BRIDGE_IMAGE}" "${BRIDGE_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${JMETER_SVC_IMAGE}" "${JMETER_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${HELM_SVC_IMAGE}" "${HELM_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${GATEKEEPER_SVC_IMAGE}" "${GATEKEEPER_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${DISTRIBUTOR_IMAGE}" "${DISTRIBUTOR_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${EVENTBROKER_IMAGE}" "${EVENTBROKER_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${SHIPYARD_SVC_IMAGE}" "${SHIPYARD_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${SHIPYARD_CONTROLLER_IMAGE}" "${SHIPYARD_CONTROLLER_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${CONFIGURATION_SVC_IMAGE}" "${CONFIGURATION_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${REMEDIATION_SVC_IMAGE}" "${REMEDIATION_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${LIGHTHOUSE_SVC_IMAGE}" "${LIGHTHOUSE_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    - source ./travis-scripts/build_develop.sh "${MONGODB_DS_IMAGE}" "${MONGODB_DS_FOLDER}" "${GIT_SHA}" "${DATE}"
+    after_script:
+      - echo "The following images have been built and pushed to dockerhub:"
+      - docker images | grep keptn
   - stage: Build CLI (OSX, Windows, Linux)
     if: branch = master AND (type = cron OR type = push)
     os: osx

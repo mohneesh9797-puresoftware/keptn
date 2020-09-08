@@ -513,6 +513,21 @@ jobs:
       - echo "The following images have been built and pushed to dockerhub:"
       - docker images | grep keptn
   
+  - stage: Build Docker Images
+    arch: arm64
+    if: branch = master AND (type = cron or type = push)
+    os: linux
+    services:
+      - docker
+    script:
+    - export VERSION="master+${DATE}"
+    - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
+    - ./writeManifest.sh
+    - cat MANIFEST
+    - source ./travis-scripts/build_develop.sh "${SHIPYARD_SVC_IMAGE}" "${SHIPYARD_SVC_FOLDER}" "${GIT_SHA}" "${DATE}"
+    after_script:
+      - echo "The following images have been built and pushed to dockerhub:"
+      - docker images | grep keptn
       
   
     

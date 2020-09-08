@@ -621,6 +621,20 @@ jobs:
       - export VERSION="latest"
       - echo "Build installer"
       - source ./travis-scripts/build_latest_installer.sh "${VERSION}"
+      
+  - stage: Build Installer
+    arch: arm64
+    if: branch = master AND (type = cron OR type = push)
+    os: linux
+    before_script:
+      - source ./travis-scripts/install_gcloud.sh
+      - echo ${GCLOUD_SERVICE_KEY} | base64 --decode > ~/gcloud-service-key.json
+      - gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
+      - source ./travis-scripts/install_helm.sh
+    script:
+      - export VERSION="latest"
+      - echo "Build installer"
+      - source ./travis-scripts/build_latest_installer.sh "${VERSION}"     
   ##################################################################################
   # feature/bug/hotfix/patch branches build jobs
   ##################################################################################

@@ -872,6 +872,37 @@ jobs:
       - kubectl get pods --all-namespaces
       - kubectl get services --all-namespaces
       - kubectl get ingress --all-namespaces
+  - stage: Test Minishift Standalone (--platform=openshift)
+    arch: arm64
+    if: (branch = master or branch =~ ^release.*$) AND (type = cron OR type = push) # run for any change on master/release-* on push and cron
+    os: linux
+    before_script:
+      # download and install kubectl
+      - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/arm64/kubectl && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+      - test/utils/download_and_install_keptn_cli.sh
+      - test/utils/download_and_install_oc_cli.sh
+      - test/utils/minishift_create_cluster.sh
+    script:
+      # sanity check that the K8s cluster is available
+      - kubectl get nodes || travis_terminate 1      
+      # install keptn quality gates
+      - test/test_install_minishift_quality_gates.sh
+      - keptn status
+      - export PROJECT=musicshop
+      - export PLATFORM=openshift
+      - export DYNATRACE_SLI_SERVICE_VERSION=master
+      - test/test_quality_gates_standalone.sh
+    after_success:
+      # delete Google Kubernetes cluster only on success (keep cluster in case of an error to dig into the cluster)
+      - echo "Tests were successful, cleaning up the cluster now..."
+    after_failure:
+      # print debug info
+      - cat ~/.keptn/keptn-installer.log
+      - kubectl get events --sort-by='.lastTimestamp' --all-namespaces
+      - kubectl get pods --all-namespaces
+      - kubectl get services --all-namespaces
+      - kubectl get ingress --all-namespaces
+
 
   - &K3sStandaloneTest
     stage: Test K3s Standalone (--platform=kubernetes)

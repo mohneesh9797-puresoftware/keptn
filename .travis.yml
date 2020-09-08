@@ -383,7 +383,6 @@ jobs:
       - docker
     script:
     - export VERSION="master+${DATE}"
-    - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
     - ./writeManifest.sh
     - cat MANIFEST
     - source ./travis-scripts/build_develop.sh "${API_IMAGE}" "${API_FOLDER}" "${GIT_SHA}" "${DATE}"

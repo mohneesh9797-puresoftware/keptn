@@ -32,7 +32,7 @@ RUN addgroup mygroup && adduser -D -G mygroup myuser && mkdir -p /usr/src/app &&
 WORKDIR /usr/src/app
 
 # install additional dependencies for running the app
-RUN npm install express@4.17.1 depd@1.1.2 cookie-parser@1.4.4 morgan@1.9.1 axios@0.19.2
+RUN npm install -g express@4.17.1 depd@1.1.2 cookie-parser@1.4.4 morgan@1.9.1 axios@0.19.2
 
 # copy source
 COPY . /usr/src/app
